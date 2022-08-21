@@ -28,8 +28,6 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
-
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
 // 2. Split the given string on the commas present in it
@@ -45,13 +43,35 @@ enum ParsePersonError {
 
 impl FromStr for Person {
     type Err = ParsePersonError;
+
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.is_empty() {
+            return Err(ParsePersonError::Empty);
+        }
+
+        let tokens: Vec<&str> = s.split(',').collect();
+
+        if tokens.len() != 2 {
+            return Err(ParsePersonError::BadLen);
+        }
+
+        if tokens[0].is_empty() {
+            return Err(ParsePersonError::NoName);
+        }
+
+        let name = tokens[0].into();
+        let age = tokens[1].parse().map_err(ParsePersonError::ParseInt)?;
+
+        Ok(Person { name, age })
     }
 }
 
 fn main() {
-    let p = "Mark,20".parse::<Person>().unwrap();
-    println!("{:?}", p);
+    //let p = "Mark,20".parse::<Person>().unwrap();
+    //println!("{:?}", p);
+
+    let pp = "John,".parse::<Person>();
+    println!("{:?}", pp);
 }
 
 #[cfg(test)]
